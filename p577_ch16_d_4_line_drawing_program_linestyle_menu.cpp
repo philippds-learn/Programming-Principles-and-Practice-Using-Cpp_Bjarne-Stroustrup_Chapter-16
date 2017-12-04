@@ -1,6 +1,6 @@
 //  Philipp Siedler
 //  Bjarne Stroustrup's PP
-//  Chapter 16 Drill 2
+//  Chapter 16 Drill 4
 
 #define _USE_MATH_DEFINES
 #include "Simple_window.h"
@@ -24,26 +24,48 @@ private:
 	In_box next_x;
 	In_box next_y;
 	Out_box xy_out;
+
+	// color menu
 	Menu color_menu;
-	Button menu_button;
+	Button color_menu_button;
+	void change_color(Color c) { lines.set_color(c); }
+	void hide_color_menu() { color_menu.hide(); color_menu_button.show(); }
 
-	void change(Color c) { lines.set_color(c); }
-
-	void hide_menu() { color_menu.hide(); menu_button.show(); }
+	// line style menu
+	Menu line_style_menu;
+	Button line_style_menu_button;
+	void change_line_style(Line_style ls) { lines.set_style(ls); }
+	void hide_line_style_menu() { line_style_menu.hide(); line_style_menu_button.show(); }
 
 	// actions invoked by callbacks
-	void red_pressed() { change(Color::red); hide_menu(); }
-	void blue_pressed() { change(Color::blue); hide_menu(); }
-	void black_pressed() { change(Color::black); hide_menu(); }
-	void menu_pressed() { menu_button.hide(); color_menu.show(); }
+	// color menu
+	void red_pressed() { change_color(Color::red); hide_color_menu(); }
+	void blue_pressed() { change_color(Color::blue); hide_color_menu(); }
+	void black_pressed() { change_color(Color::black); hide_color_menu(); }
+	void color_menu_pressed() { color_menu_button.hide(); color_menu.show(); }
+
+	// line style menu
+	void solid_pressed() { change_line_style(Line_style::solid); hide_line_style_menu(); }
+	void dashed_pressed() { change_line_style(Line_style::dash); hide_line_style_menu(); }
+	void dotted_pressed() { change_line_style(Line_style::dot); hide_line_style_menu(); }
+	void line_style_menu_pressed() { line_style_menu_button.hide(); line_style_menu.show(); }
+
 	void next();
 	void quit();
 
 	// callback functions
+	// color
 	static void cb_red(Address, Address);
 	static void cb_blue(Address, Address);
 	static void cb_black(Address, Address);
-	static void cb_menu(Address, Address);
+	static void cb_color_menu(Address, Address);
+
+	// line style
+	static void cb_solid(Address, Address);
+	static void cb_dash(Address, Address);
+	static void cb_dot(Address, Address);
+	static void cb_line_style_menu(Address, Address);
+
 	static void cb_next(Address, Address);
 	static void cb_quit(Address, Address);
 };
@@ -56,20 +78,36 @@ Lines_window::Lines_window(Point xy, int w, int h, const string& title)
 	next_y(Point(x_max() - 210, 0), 50, 20, "next y:"),
 	xy_out(Point(100, 0), 100, 20, "current (x,y):"),
 	color_menu(Point(x_max() - 70, 30), 70, 20, Menu::vertical, "color"),
-	menu_button(Point(x_max() - 80, 30), 80, 20, "color menu", cb_menu)
+	color_menu_button(Point(x_max() - 80, 30), 80, 20, "color menu", cb_color_menu),
+	line_style_menu(Point(x_max() - 70, 90), 70, 20, Menu::vertical, "line style"),
+	line_style_menu_button(Point(x_max() - 80, 90), 80, 20, "style menu", cb_line_style_menu)
 {
 	attach(next_button);
 	attach(quit_button);
 	attach(next_x);
 	attach(next_y);
 	attach(xy_out);
+
+	// initialize out box and line color
 	xy_out.put("no point");
+	lines.set_color(Color::black);
+
 	color_menu.attach(new Button(Point(0, 0), 0, 0, "red", cb_red));
 	color_menu.attach(new Button(Point(0, 0), 0, 0, "blue", cb_blue));
 	color_menu.attach(new Button(Point(0, 0), 0, 0, "black", cb_black));
+
+	line_style_menu.attach(new Button(Point(0, 0), 0, 0, "solid", cb_solid));
+	line_style_menu.attach(new Button(Point(0, 0), 0, 0, "dashed", cb_dash));
+	line_style_menu.attach(new Button(Point(0, 0), 0, 0, "dotted", cb_dot));
+
 	attach(color_menu);
+	attach(line_style_menu);
+
 	color_menu.hide();
-	attach(menu_button);
+	line_style_menu.hide();
+
+	attach(line_style_menu_button);
+	attach(color_menu_button);
 	attach(lines);
 }
 
@@ -93,6 +131,7 @@ void Lines_window::quit()
 	hide();
 }
 
+// color callback
 void Lines_window::cb_red(Address, Address pw)
 {
 	reference_to<Lines_window>(pw).red_pressed();
@@ -108,11 +147,33 @@ void Lines_window::cb_black(Address, Address pw)
 	reference_to<Lines_window>(pw).black_pressed();
 }
 
-void Lines_window::cb_menu(Address, Address pw)
+void Lines_window::cb_color_menu(Address, Address pw)
 {
-	reference_to<Lines_window>(pw).menu_pressed();
+	reference_to<Lines_window>(pw).color_menu_pressed();
 }
 
+// line style callback
+void Lines_window::cb_solid(Address, Address pw)
+{
+	reference_to<Lines_window>(pw).solid_pressed();
+}
+
+void Lines_window::cb_dash(Address, Address pw)
+{
+	reference_to<Lines_window>(pw).dashed_pressed();
+}
+
+void Lines_window::cb_dot(Address, Address pw)
+{
+	reference_to<Lines_window>(pw).dotted_pressed();
+}
+
+void Lines_window::cb_line_style_menu(Address, Address pw)
+{
+	reference_to<Lines_window>(pw).line_style_menu_pressed();
+}
+
+// next + quit callback
 void Lines_window::cb_next(Address, Address pw)
 {
 	reference_to<Lines_window>(pw).next();

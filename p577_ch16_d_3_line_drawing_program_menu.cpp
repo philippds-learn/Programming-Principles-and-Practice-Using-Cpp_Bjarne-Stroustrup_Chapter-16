@@ -1,6 +1,6 @@
 //  Philipp Siedler
 //  Bjarne Stroustrup's PP
-//  Chapter 16 Drill 2
+//  Chapter 16 Drill 3
 
 #define _USE_MATH_DEFINES
 #include "Simple_window.h"
