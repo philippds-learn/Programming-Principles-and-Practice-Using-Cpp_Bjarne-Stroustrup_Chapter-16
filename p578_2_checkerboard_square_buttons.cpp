@@ -66,22 +66,22 @@ struct cheker_board_buttons : My_window
 		int y_size = ymax / 4;
 
 		// initialize buttons
-		buttons.push_back(new Button(Point(0, 20), xmax / 4, ymax / 4, "b0", cb_change_0));
-		buttons.push_back(new Button(Point(x_size, 20), xmax / 4, ymax / 4, "b1", cb_change_1));
-		buttons.push_back(new Button(Point(x_size * 2, 20), xmax / 4, ymax / 4, "b2", cb_change_2));
-		buttons.push_back(new Button(Point(x_size * 3, 20), xmax / 4, ymax / 4, "b3", cb_change_3));
-		buttons.push_back(new Button(Point(0, y_size + 20), xmax / 4, ymax / 4, "b4", cb_change_4));
-		buttons.push_back(new Button(Point(x_size, y_size + 20), xmax / 4, ymax / 4, "b5", cb_change_5));
-		buttons.push_back(new Button(Point(x_size * 2, y_size + 20), xmax / 4, ymax / 4, "b6", cb_change_6));
-		buttons.push_back(new Button(Point(x_size * 3, y_size + 20), xmax / 4, ymax / 4, "b7", cb_change_7));
-		buttons.push_back(new Button(Point(0, y_size * 2 + 20), xmax / 4, ymax / 4, "b8", cb_change_8));
-		buttons.push_back(new Button(Point(x_size, y_size * 2 + 20), xmax / 4, ymax / 4, "b9", cb_change_9));
-		buttons.push_back(new Button(Point(x_size * 2, y_size * 2 + 20), xmax / 4, ymax / 4, "b10", cb_change_10));
-		buttons.push_back(new Button(Point(x_size * 3, y_size * 2 + 20), xmax / 4, ymax / 4, "b11", cb_change_11));
-		buttons.push_back(new Button(Point(0, y_size * 3 + 20), xmax / 4, ymax / 4, "b12", cb_change_12));
-		buttons.push_back(new Button(Point(x_size, y_size * 3 + 20), xmax / 4, ymax / 4, "b13", cb_change_13));
-		buttons.push_back(new Button(Point(x_size * 2, y_size * 3 + 20), xmax / 4, ymax / 4, "b14", cb_change_14));
-		buttons.push_back(new Button(Point(x_size * 3, y_size * 3 + 20), xmax / 4, ymax / 4, "b15", cb_change_15));
+		buttons.push_back(new Button(Point(0, 20), x_size, y_size, "b0", cb_change_0));
+		buttons.push_back(new Button(Point(x_size, 20), x_size, y_size, "b1", cb_change_1));
+		buttons.push_back(new Button(Point(x_size * 2, 20), x_size, y_size, "b2", cb_change_2));
+		buttons.push_back(new Button(Point(x_size * 3, 20), x_size, y_size, "b3", cb_change_3));
+		buttons.push_back(new Button(Point(0, y_size + 20), x_size, y_size, "b4", cb_change_4));
+		buttons.push_back(new Button(Point(x_size, y_size + 20), x_size, y_size, "b5", cb_change_5));
+		buttons.push_back(new Button(Point(x_size * 2, y_size + 20), x_size, y_size, "b6", cb_change_6));
+		buttons.push_back(new Button(Point(x_size * 3, y_size + 20), x_size, y_size, "b7", cb_change_7));
+		buttons.push_back(new Button(Point(0, y_size * 2 + 20), x_size, y_size, "b8", cb_change_8));
+		buttons.push_back(new Button(Point(x_size, y_size * 2 + 20), x_size, y_size, "b9", cb_change_9));
+		buttons.push_back(new Button(Point(x_size * 2, y_size * 2 + 20), x_size, y_size, "b10", cb_change_10));
+		buttons.push_back(new Button(Point(x_size * 3, y_size * 2 + 20), x_size, y_size, "b11", cb_change_11));
+		buttons.push_back(new Button(Point(0, y_size * 3 + 20), x_size, y_size, "b12", cb_change_12));
+		buttons.push_back(new Button(Point(x_size, y_size * 3 + 20), x_size, y_size, "b13", cb_change_13));
+		buttons.push_back(new Button(Point(x_size * 2, y_size * 3 + 20), x_size, y_size, "b14", cb_change_14));
+		buttons.push_back(new Button(Point(x_size * 3, y_size * 3 + 20), x_size, y_size, "b15", cb_change_15));
 
 		// attach buttons
 		for (int i = 0; i < buttons.size(); i++) { attach(buttons[i]); }
