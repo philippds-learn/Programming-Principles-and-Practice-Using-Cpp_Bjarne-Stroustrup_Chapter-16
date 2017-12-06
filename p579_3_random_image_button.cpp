@@ -47,12 +47,12 @@ private:
 
 	static void cb_next(Address, Address addr)
 	{
-		static_cast<My_window*>(addr)->next();
+		reference_to<My_window>(addr).next();
 	}
 
 	static void cb_quit(Address, Address addr)
 	{
-		static_cast<My_window*>(addr)->quit();
+		reference_to<My_window>(addr).quit();
 	}
 
 	void next() { next_button_pushed = true; }

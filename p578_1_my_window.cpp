@@ -44,13 +44,13 @@ private:
 	static void cb_next(Address, Address addr) // callback for next_button
 											   //	{ reference_to<Simple_window>(addr).next(); }
 	{
-		static_cast<My_window*>(addr)->next();
+		reference_to<My_window>(addr).next();
 	}
 
 	static void cb_quit(Address, Address addr) // callback for quit_button
 											   //	{ reference_to<Simple_window>(addr).quit(); }
 	{
-		static_cast<My_window*>(addr)->quit();
+		reference_to<My_window>(addr).quit();
 	}
 
 	void next() { next_button_pushed = true; }
