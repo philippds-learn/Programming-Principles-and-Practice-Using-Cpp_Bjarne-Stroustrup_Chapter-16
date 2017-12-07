@@ -12,73 +12,121 @@
 constexpr int xmax = 600;
 constexpr int ymax = 400;
 
-struct Lines_window : Window {
-	Lines_window(Point xy, int w, int h, const string& title);
+struct Shapes_window : Window {
+	Shapes_window(Point xy, int w, int h, const string& title);
 private:
 	// data
-	Open_polyline lines;
+	enum Shapes
+	{
+		circle, square, triangle , hexagon
+	};
+
+	Vector_ref<Shape> s;
 
 	// widgets
-	Button next_button;	// add (next_x, next_y) to lines
 	Button quit_button;	// end program
-	In_box next_x;
-	In_box next_y;
+	In_box draw_pos_x;
+	In_box draw_pos_y;
 	Out_box xy_out;
-	Menu color_menu;
+	Menu shape_menu;
 	Button menu_button;
 
-	void change(Color c) { lines.set_color(c); }
-
-	void hide_menu() { color_menu.hide(); menu_button.show(); }
+	void hide_menu() { shape_menu.hide(); menu_button.show(); }
 
 	// actions invoked by callbacks
-	void red_pressed() { change(Color::red); hide_menu(); }
-	void blue_pressed() { change(Color::blue); hide_menu(); }
-	void black_pressed() { change(Color::black); hide_menu(); }
-	void menu_pressed() { menu_button.hide(); color_menu.show(); }
-	void next();
+	void menu_pressed() { menu_button.hide(); shape_menu.show(); }
+
+	void draw_shape(Shapes s);
+	void draw_circle();
+	void draw_square();
+	void draw_triangle();
+	void draw_hexagon();
+
 	void quit();
 
 	// callback functions
-	static void cb_red(Address, Address);
-	static void cb_blue(Address, Address);
-	static void cb_black(Address, Address);
+	static void cb_circle(Address, Address);
+	static void cb_square(Address, Address);
+	static void cb_triangle(Address, Address);
+	static void cb_hexagon(Address, Address);
 	static void cb_menu(Address, Address);
-	static void cb_next(Address, Address);
 	static void cb_quit(Address, Address);
 };
 
-Lines_window::Lines_window(Point xy, int w, int h, const string& title)
+Shapes_window::Shapes_window(Point xy, int w, int h, const string& title)
 	:Window(xy, w, h, title),
-	next_button(Point(x_max() - 150, 0), 70, 20, "Next point", cb_next),
 	quit_button(Point(x_max() - 70, 0), 70, 20, "Quit", cb_quit),
-	next_x(Point(x_max() - 310, 0), 50, 20, "next x:"),
-	next_y(Point(x_max() - 210, 0), 50, 20, "next y:"),
-	xy_out(Point(100, 0), 100, 20, "current (x,y):"),
-	color_menu(Point(x_max() - 70, 30), 70, 20, Menu::vertical, "color"),
-	menu_button(Point(x_max() - 80, 30), 80, 20, "color menu", cb_menu)
+	draw_pos_x(Point(x_max() - 310, 0), 50, 20, "pos x:"),
+	draw_pos_y(Point(x_max() - 210, 0), 50, 20, "pos y:"),
+	xy_out(Point(100, 0), 100, 20, "drawn at (x,y):"),
+	shape_menu(Point(x_max() - 70, 30), 70, 20, Menu::vertical, "shape"),
+	menu_button(Point(x_max() - 80, 30), 80, 20, "shape menu", cb_menu)
 {
-	attach(next_button);
 	attach(quit_button);
-	attach(next_x);
-	attach(next_y);
+	attach(draw_pos_x);
+	attach(draw_pos_y);
 	attach(xy_out);
-	xy_out.put("no point");
-	color_menu.attach(new Button(Point(0, 0), 0, 0, "red", cb_red));
-	color_menu.attach(new Button(Point(0, 0), 0, 0, "blue", cb_blue));
-	color_menu.attach(new Button(Point(0, 0), 0, 0, "black", cb_black));
-	attach(color_menu);
-	color_menu.hide();
+
+	xy_out.put("no shape");
+
+	shape_menu.attach(new Button(Point(0, 0), 0, 0, "circle", cb_circle));
+	shape_menu.attach(new Button(Point(0, 0), 0, 0, "square", cb_square));
+	shape_menu.attach(new Button(Point(0, 0), 0, 0, "triangle", cb_triangle));
+	shape_menu.attach(new Button(Point(0, 0), 0, 0, "hexagon", cb_hexagon));
+	
+	attach(shape_menu);
+	shape_menu.hide();
 	attach(menu_button);
-	attach(lines);
 }
 
-void Lines_window::next()
+void Shapes_window::draw_shape(Shapes shape)
 {
-	int x = next_x.get_int();
-	int y = next_y.get_int();
+	int x = draw_pos_x.get_int();
+	int y = draw_pos_y.get_int();
 
-	lines.add(Point(x, y));
+	switch (shape)
+	{
+	case circle: s.push_back(new Graph_lib::Circle(Point(x, y), 10));
+	case square: s.push_back(new Graph_lib::Rectangle(Point(x,y), 20, 20));
+	case triangle: s.push_back(new Graph_lib::Rectangle(Point(x, y), Point(x + 10, y + 10)));
+	case hexagon: s.push_back(new Graph_lib::Rectangle(Point(x, y), Point(x + 10, y + 10)));
+	}
+
+
+	// update current position readout
+	ostringstream ss;
+	ss << '(' << x << ',' << y << ')';
+	xy_out.put(ss.str());
+
+	attach(s[s.size() - 1]);
+	redraw();
+	hide_menu();
+	
+}
+
+void Shapes_window::draw_circle()
+{
+	int x = draw_pos_x.get_int();
+	int y = draw_pos_y.get_int();
+
+	s.push_back(new Circle(Point(x, y), 10));
+
+	// update current position readout
+	ostringstream ss;
+	ss << '(' << x << ',' << y << ')';
+	xy_out.put(ss.str());
+
+	attach(s[0]);
+	redraw();
+	hide_menu();
+}
+
+void Shapes_window::draw_square()
+{
+	int x = draw_pos_x.get_int();
+	int y = draw_pos_y.get_int();
+
+	attach(Circle(Point(x, y), 10));
 
 	// update current position readout
 	ostringstream ss;
@@ -86,47 +134,80 @@ void Lines_window::next()
 	xy_out.put(ss.str());
 
 	redraw();
+	hide_menu();
 }
 
-void Lines_window::quit()
+void Shapes_window::draw_triangle()
+{
+	int x = draw_pos_x.get_int();
+	int y = draw_pos_y.get_int();
+
+	attach(Circle(Point(x, y), 10));
+
+	// update current position readout
+	ostringstream ss;
+	ss << '(' << x << ',' << y << ')';
+	xy_out.put(ss.str());
+
+	redraw();
+	hide_menu();
+}
+
+void Shapes_window::draw_hexagon()
+{
+	int x = draw_pos_x.get_int();
+	int y = draw_pos_y.get_int();
+
+	attach(Circle(Point(x, y), 10));
+
+	// update current position readout
+	ostringstream ss;
+	ss << '(' << x << ',' << y << ')';
+	xy_out.put(ss.str());
+
+	redraw();
+	hide_menu();
+}
+
+void Shapes_window::quit()
 {
 	hide();
 }
 
-void Lines_window::cb_red(Address, Address pw)
+void Shapes_window::cb_circle(Address, Address pw)
 {
-	reference_to<Lines_window>(pw).red_pressed();
+	reference_to<Shapes_window>(pw).draw_circle();
 }
 
-void Lines_window::cb_blue(Address, Address pw)
+void Shapes_window::cb_square(Address, Address pw)
 {
-	reference_to<Lines_window>(pw).blue_pressed();
+	reference_to<Shapes_window>(pw).draw_square();
 }
 
-void Lines_window::cb_black(Address, Address pw)
+void Shapes_window::cb_triangle(Address, Address pw)
 {
-	reference_to<Lines_window>(pw).black_pressed();
+	reference_to<Shapes_window>(pw).draw_triangle();
 }
 
-void Lines_window::cb_menu(Address, Address pw)
+void Shapes_window::cb_hexagon(Address, Address pw)
 {
-	reference_to<Lines_window>(pw).menu_pressed();
+	reference_to<Shapes_window>(pw).draw_hexagon();
 }
 
-void Lines_window::cb_next(Address, Address pw)
+void Shapes_window::cb_menu(Address, Address pw)
 {
-	reference_to<Lines_window>(pw).next();
+	reference_to<Shapes_window>(pw).menu_pressed();
 }
 
-void Lines_window::cb_quit(Address, Address pw)
+void Shapes_window::cb_quit(Address, Address pw)
 {
-	reference_to<Lines_window>(pw).quit();
+	reference_to<Shapes_window>(pw).quit();
 }
 
 int main()
 try
 {
-	Lines_window win(Point(100, 100), xmax, ymax, "lines");
+	Shapes_window win(Point(100, 100), xmax, ymax, "lines");
 	return gui_main();
 }
 catch (exception& e) {
