@@ -12,6 +12,7 @@
 constexpr int xmax = 600;
 constexpr int ymax = 400;
 
+// QUAD
 struct Quad_center : Closed_polyline
 {
 	Quad_center(Point center, int w, int h)
@@ -32,6 +33,7 @@ void Quad_center::draw_lines() const
 	Closed_polyline::draw_lines();
 }
 
+// TRIANGLE
 struct Triangle : Closed_polyline
 {
 	Triangle(Point origin, int edge_length)
@@ -53,6 +55,7 @@ void Triangle::draw_lines() const
 	Closed_polyline::draw_lines();
 }
 
+// HEXAGON
 struct Hexagon : Closed_polyline
 {
 	Hexagon(Point origin, int radius)
@@ -72,6 +75,7 @@ void Hexagon::draw_lines() const
 	Closed_polyline::draw_lines();
 }
 
+// DRAW SHAPES WINDOW
 struct Shapes_window : Window {
 	Shapes_window(Point xy, int w, int h, const string& title);
 private:
@@ -148,8 +152,8 @@ void Shapes_window::draw_shape(Shapes shape)
 	{
 	case circle: s.push_back(new Circle(Point(x, y), 10));
 	case square: s.push_back(new Quad_center(Point(x,y), 20, 20));
-	case triangle: s.push_back(new Graph_lib::Rectangle(Point(x, y), Point(x + 10, y + 10)));
-	case hexagon: s.push_back(new Graph_lib::Rectangle(Point(x, y), Point(x + 10, y + 10)));
+	case triangle: s.push_back(new Triangle(Point(x, y), 20));
+	case hexagon: s.push_back(new Hexagon(Point(x, y), 10));
 	}
 	
 	// update current position readout
@@ -237,7 +241,7 @@ void Shapes_window::quit()
 
 void Shapes_window::cb_circle(Address, Address pw)
 {
-	reference_to<Shapes_window>(pw).draw_circle();
+	reference_to<Shapes_window>(pw).draw_shape(circle)();
 }
 
 void Shapes_window::cb_square(Address, Address pw)
