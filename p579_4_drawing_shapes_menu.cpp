@@ -12,6 +12,66 @@
 constexpr int xmax = 600;
 constexpr int ymax = 400;
 
+struct Quad_center : Closed_polyline
+{
+	Quad_center(Point center, int w, int h)
+	{
+		add(Point(center.x - w / 2, center.y - h / 2));
+		add(Point(center.x + w / 2, center.y - h / 2));
+		add(Point(center.x + w / 2, center.y + h / 2));
+		add(Point(center.x - w / 2, center.y + h / 2));
+		
+	}
+
+	void draw_lines() const;
+};
+
+void Quad_center::draw_lines() const
+{
+	fl_color(FL_BLACK);
+	Closed_polyline::draw_lines();
+}
+
+struct Triangle : Closed_polyline
+{
+	Triangle(Point origin, int edge_length)
+	{
+		int h = sqrt(3) / 2 * edge_length;
+
+		Point p(origin.x - edge_length / 2, origin.y + edge_length / 2);
+		add(p);		
+		add(Point(p.x + edge_length, p.y));
+		add(Point(p.x + edge_length / 2, p.y - h));
+	}
+
+	void draw_lines() const;
+};
+
+void Triangle::draw_lines() const
+{
+	fl_color(FL_BLACK);
+	Closed_polyline::draw_lines();
+}
+
+struct Hexagon : Closed_polyline
+{
+	Hexagon(Point origin, int radius)
+	{
+		int n = 6;
+		for (int i = 0; i < n; i++) {
+			add(Point(origin.x + radius * cos(2 * M_PI * i / n), origin.y + radius * sin(2 * M_PI * i / n)));
+		}
+	}
+
+	void draw_lines() const;
+};
+
+void Hexagon::draw_lines() const
+{
+	fl_color(FL_BLACK);
+	Closed_polyline::draw_lines();
+}
+
 struct Shapes_window : Window {
 	Shapes_window(Point xy, int w, int h, const string& title);
 private:
@@ -86,12 +146,28 @@ void Shapes_window::draw_shape(Shapes shape)
 
 	switch (shape)
 	{
-	case circle: s.push_back(new Graph_lib::Circle(Point(x, y), 10));
-	case square: s.push_back(new Graph_lib::Rectangle(Point(x,y), 20, 20));
+	case circle: s.push_back(new Circle(Point(x, y), 10));
+	case square: s.push_back(new Quad_center(Point(x,y), 20, 20));
 	case triangle: s.push_back(new Graph_lib::Rectangle(Point(x, y), Point(x + 10, y + 10)));
 	case hexagon: s.push_back(new Graph_lib::Rectangle(Point(x, y), Point(x + 10, y + 10)));
 	}
+	
+	// update current position readout
+	ostringstream ss;
+	ss << '(' << x << ',' << y << ')';
+	xy_out.put(ss.str());
 
+	attach(s[s.size() - 1]);
+	redraw();
+	hide_menu();	
+}
+
+void Shapes_window::draw_circle()
+{
+	int x = draw_pos_x.get_int();
+	int y = draw_pos_y.get_int();
+
+	s.push_back(new Circle(Point(x, y), 25));
 
 	// update current position readout
 	ostringstream ss;
@@ -101,24 +177,6 @@ void Shapes_window::draw_shape(Shapes shape)
 	attach(s[s.size() - 1]);
 	redraw();
 	hide_menu();
-	
-}
-
-void Shapes_window::draw_circle()
-{
-	int x = draw_pos_x.get_int();
-	int y = draw_pos_y.get_int();
-
-	s.push_back(new Circle(Point(x, y), 10));
-
-	// update current position readout
-	ostringstream ss;
-	ss << '(' << x << ',' << y << ')';
-	xy_out.put(ss.str());
-
-	attach(s[0]);
-	redraw();
-	hide_menu();
 }
 
 void Shapes_window::draw_square()
@@ -126,13 +184,14 @@ void Shapes_window::draw_square()
 	int x = draw_pos_x.get_int();
 	int y = draw_pos_y.get_int();
 
-	attach(Circle(Point(x, y), 10));
+	s.push_back(new Quad_center(Point(x, y), 50, 50));
 
 	// update current position readout
 	ostringstream ss;
 	ss << '(' << x << ',' << y << ')';
 	xy_out.put(ss.str());
 
+	attach(s[s.size() - 1]);
 	redraw();
 	hide_menu();
 }
@@ -142,13 +201,14 @@ void Shapes_window::draw_triangle()
 	int x = draw_pos_x.get_int();
 	int y = draw_pos_y.get_int();
 
-	attach(Circle(Point(x, y), 10));
+	s.push_back(new Triangle(Point(x, y), 50));
 
 	// update current position readout
 	ostringstream ss;
 	ss << '(' << x << ',' << y << ')';
 	xy_out.put(ss.str());
 
+	attach(s[s.size() - 1]);
 	redraw();
 	hide_menu();
 }
@@ -158,13 +218,14 @@ void Shapes_window::draw_hexagon()
 	int x = draw_pos_x.get_int();
 	int y = draw_pos_y.get_int();
 
-	attach(Circle(Point(x, y), 10));
+	s.push_back(new Hexagon(Point(x, y), 20));
 
 	// update current position readout
 	ostringstream ss;
 	ss << '(' << x << ',' << y << ')';
 	xy_out.put(ss.str());
 
+	attach(s[s.size() - 1]);
 	redraw();
 	hide_menu();
 }
