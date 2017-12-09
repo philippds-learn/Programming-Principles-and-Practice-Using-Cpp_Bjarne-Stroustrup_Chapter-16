@@ -7,6 +7,7 @@
 #include "Graph.h"
 #include <cmath>
 #include "GUI.h"
+#include <time.h>
 
 // layout
 constexpr int xmax = 400;
@@ -23,6 +24,9 @@ struct Analog_clock_window : Window {
 	Button quit_button;
 
 private:
+	void get_time();
+	void draw_hands();
+
 
 	static void cb_quit(Address, Address addr)
 	{
@@ -31,6 +35,34 @@ private:
 
 	void quit() { hide(); }
 };
+
+void Analog_clock_window::get_time()
+{
+	#pragma warning(disable : 4996)
+
+	time_t rawtime;
+	struct tm * timeinfo;
+	char buffer[80];
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	strftime(buffer, sizeof(buffer), "%d-%m-%Y %I:%M:%S", timeinfo);
+	std::string str(buffer);
+	std::cout << str << endl;
+	cout << timeinfo->tm_sec << endl;
+}
+
+void Analog_clock_window::draw_hands()
+{
+	int seconds;
+	while (true) {
+		if (clock() / CLOCKS_PER_SEC == seconds) {
+			seconds++;
+
+		}
+	}
+}
 
 int main()
 try
