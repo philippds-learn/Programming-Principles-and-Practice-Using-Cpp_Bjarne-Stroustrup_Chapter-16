@@ -99,13 +99,7 @@ private:
 
 	// actions invoked by callbacks
 	void menu_pressed() { menu_button.hide(); shape_menu.show(); }
-
 	void draw_shape(Shapes s);
-	void draw_circle();
-	void draw_square();
-	void draw_triangle();
-	void draw_hexagon();
-
 	void quit();
 
 	// callback functions
@@ -145,93 +139,33 @@ Shapes_window::Shapes_window(Point xy, int w, int h, const string& title)
 
 void Shapes_window::draw_shape(Shapes shape)
 {
-	int x = draw_pos_x.get_int();
-	int y = draw_pos_y.get_int();
 
-	switch (shape)
+	if (draw_pos_x.get_int() == -999999)
 	{
-	case circle: s.push_back(new Circle(Point(x, y), 10));
-	case square: s.push_back(new Quad_center(Point(x,y), 20, 20));
-	case triangle: s.push_back(new Triangle(Point(x, y), 20));
-	case hexagon: s.push_back(new Hexagon(Point(x, y), 10));
+		xy_out.put("enter position");
 	}
-	
-	// update current position readout
-	ostringstream ss;
-	ss << '(' << x << ',' << y << ')';
-	xy_out.put(ss.str());
+	else {
 
-	attach(s[s.size() - 1]);
-	redraw();
-	hide_menu();	
-}
+		int x = draw_pos_x.get_int();
+		int y = draw_pos_y.get_int();
 
-void Shapes_window::draw_circle()
-{
-	int x = draw_pos_x.get_int();
-	int y = draw_pos_y.get_int();
+		switch (shape)
+		{
+		case circle: { s.push_back(new Circle(Point(x, y), 20)); break; }
+		case square: { s.push_back(new Quad_center(Point(x, y), 40, 40)); break; }
+		case triangle: { s.push_back(new Triangle(Point(x, y), 40)); break; }
+		case hexagon: { s.push_back(new Hexagon(Point(x, y), 20)); break; }
+		}
 
-	s.push_back(new Circle(Point(x, y), 25));
+		// update current position readout
+		ostringstream ss;
+		ss << '(' << x << ',' << y << ')';
+		xy_out.put(ss.str());
 
-	// update current position readout
-	ostringstream ss;
-	ss << '(' << x << ',' << y << ')';
-	xy_out.put(ss.str());
-
-	attach(s[s.size() - 1]);
-	redraw();
-	hide_menu();
-}
-
-void Shapes_window::draw_square()
-{
-	int x = draw_pos_x.get_int();
-	int y = draw_pos_y.get_int();
-
-	s.push_back(new Quad_center(Point(x, y), 50, 50));
-
-	// update current position readout
-	ostringstream ss;
-	ss << '(' << x << ',' << y << ')';
-	xy_out.put(ss.str());
-
-	attach(s[s.size() - 1]);
-	redraw();
-	hide_menu();
-}
-
-void Shapes_window::draw_triangle()
-{
-	int x = draw_pos_x.get_int();
-	int y = draw_pos_y.get_int();
-
-	s.push_back(new Triangle(Point(x, y), 50));
-
-	// update current position readout
-	ostringstream ss;
-	ss << '(' << x << ',' << y << ')';
-	xy_out.put(ss.str());
-
-	attach(s[s.size() - 1]);
-	redraw();
-	hide_menu();
-}
-
-void Shapes_window::draw_hexagon()
-{
-	int x = draw_pos_x.get_int();
-	int y = draw_pos_y.get_int();
-
-	s.push_back(new Hexagon(Point(x, y), 20));
-
-	// update current position readout
-	ostringstream ss;
-	ss << '(' << x << ',' << y << ')';
-	xy_out.put(ss.str());
-
-	attach(s[s.size() - 1]);
-	redraw();
-	hide_menu();
+		attach(s[s.size() - 1]);
+		redraw();
+		hide_menu();
+	}
 }
 
 void Shapes_window::quit()
@@ -241,22 +175,22 @@ void Shapes_window::quit()
 
 void Shapes_window::cb_circle(Address, Address pw)
 {
-	reference_to<Shapes_window>(pw).draw_shape(circle)();
+	reference_to<Shapes_window>(pw).draw_shape(circle);
 }
 
 void Shapes_window::cb_square(Address, Address pw)
 {
-	reference_to<Shapes_window>(pw).draw_square();
+	reference_to<Shapes_window>(pw).draw_shape(square);
 }
 
 void Shapes_window::cb_triangle(Address, Address pw)
 {
-	reference_to<Shapes_window>(pw).draw_triangle();
+	reference_to<Shapes_window>(pw).draw_shape(triangle);
 }
 
 void Shapes_window::cb_hexagon(Address, Address pw)
 {
-	reference_to<Shapes_window>(pw).draw_hexagon();
+	reference_to<Shapes_window>(pw).draw_shape(hexagon);
 }
 
 void Shapes_window::cb_menu(Address, Address pw)
