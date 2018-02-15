@@ -1,6 +1,6 @@
 //  Philipp Siedler
 //  Bjarne Stroustrup's PP
-//  Chapter 16 Exercise 6
+//  Chapter 16 Exercise 7
 
 #define _USE_MATH_DEFINES
 #include "Simple_window.h"
@@ -38,17 +38,17 @@ struct Analog_clock_window : Window {
 		: Window(xy, w, h, title),
 		quit_button(Point(x_max() - 70, 0), 70, 20, "Quit", cb_quit)
 	{
-		attach(quit_button);		
+		attach(quit_button);
 
 		while (true) {
 			Fl::wait();
-			Sleep(1000);			
+			Sleep(1000);
 			cout << "sleep" << endl;
 			draw_shape();
 			Fl::redraw();
 		}
 	}
-	
+
 	Vector_ref<Shape> s;
 	void draw_shape();
 
@@ -66,7 +66,7 @@ private:
 
 void Analog_clock_window::print_current_time(time_t &rt)
 {
-	#pragma warning(disable : 4996) //_CRT_SECURE_NO_WARNINGS
+#pragma warning(disable : 4996) //_CRT_SECURE_NO_WARNINGS
 
 	struct tm * timeinfo;
 	timeinfo = localtime(&rt);
@@ -100,7 +100,7 @@ void Analog_clock_window::draw_shape()
 		attach(s[s.size() - 1]);
 	}
 
-	#pragma warning(disable : 4996) //_CRT_SECURE_NO_WARNINGS
+#pragma warning(disable : 4996) //_CRT_SECURE_NO_WARNINGS
 	time_t rawT;
 	time(&rawT);
 
@@ -115,10 +115,10 @@ void Analog_clock_window::draw_shape()
 
 	double rad = timeinfo->tm_sec * ((2 * M_PI) / 60);
 	Point rotated_Pt1 = Point(cos(rad) * origin_Pt1.x - sin(rad) * origin_Pt1.y, sin(rad) * origin_Pt1.x + cos(rad) * origin_Pt1.y);
-	
-	s.push_back(new Hands(center, Point(rotated_Pt1.x + center.x , rotated_Pt1.y + center.y), Color::red));
+
+	s.push_back(new Hands(center, Point(rotated_Pt1.x + center.x, rotated_Pt1.y + center.y), Color::red));
 	attach(s[s.size() - 1]);
-	
+
 	// MINUTE HAND
 	Point origin_Pt2(0, -80);
 
