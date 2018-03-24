@@ -14,68 +14,102 @@ constexpr int xmax = 400;
 constexpr int ymax = 400;
 
 // HANDS
-struct Hands : Open_polyline
+struct Airplane : Shape
 {
-	Hands(Point center, Point end, Fl_Color color)
+	Airplane(string content_location, Point& position, int canvas_width, int canvas_height)
+		: content_location(content_location)
+		, position(position)
+		, canvas_width(canvas_width)
+		, canvas_height(canvas_height)
 	{
-		add(Point(center));
-		add(Point(end));
-		c = color;
+		image_width = 250;
+		image_height = 150;
+		velocity = Point(1, 1);
 	}
 
+	void move();
 	void draw_lines() const;
-	Fl_Color c;
+
+	string content_location;
+	Point position;
+
+	Point velocity;
+
+	int image_width;
+	int image_height;
+
+	int canvas_width;
+	int canvas_height;
 };
 
-void Hands::draw_lines() const
+void Airplane::move()
 {
-	fl_color(c);
-	Open_polyline::draw_lines();
+	
+
+	if (position.x <= canvas_width - image_width)
+	{
+		position.x += velocity.x;
+	}
+	if (position.y <= canvas_height - image_height)
+	{
+		position.y += velocity.y;
+	}
+
+	if (position.x == canvas_width - image_width || position.x == 0)
+	{
+		velocity.x *= -1;
+	}
+	if (position.y == canvas_height - image_height || position.y == 0)
+	{
+		velocity.y *= -1;
+	}
+
 }
 
-struct Analog_clock_window : Window {
-	Analog_clock_window(Point xy, int w, int h, const string& title)
+void Airplane::draw_lines() const
+{
+	Image image0(position, content_location);
+	image0.set_mask(Point(100, 70), image_width, image_height);
+
+	if (color().visibility()) {		
+		// draw content image
+		image0.draw();
+	}
+}
+
+struct animation_window : Window {
+	animation_window(Point xy, int w, int h, const string& title)
 		: Window(xy, w, h, title),
 		quit_button(Point(x_max() - 70, 0), 70, 20, "Quit", cb_quit)
 	{
 		attach(quit_button);
+		//position = Point(0, 0);
+		Airplane plane("Data/airplanes-work-1.jpg", Point(0, 0), w, h);
 
 		while (true) {
 			Fl::wait();
-			Sleep(1000);
-			cout << "sleep" << endl;
-			draw_shape();
+			Sleep(10);	
+			draw_shape(plane);
+			plane.move();
 			Fl::redraw();
 		}
 	}
 
 	Vector_ref<Shape> s;
-	void draw_shape();
+	void move_next(Point& pos);
+	void draw_shape(Airplane& plane);
 
 	Button quit_button;
 
 private:
-	time_t rawtime;
-	bool button_pushed;
 
-	void print_current_time(time_t &rt);
+	//Point position;
 
-	static void cb_quit(Address, Address addr) { reference_to<Analog_clock_window>(addr).quit(); }
+	static void cb_quit(Address, Address addr) { reference_to<animation_window>(addr).quit(); }
 	void quit() { hide(); }
 };
 
-void Analog_clock_window::print_current_time(time_t &rt)
-{
-#pragma warning(disable : 4996) //_CRT_SECURE_NO_WARNINGS
-
-	struct tm * timeinfo;
-	timeinfo = localtime(&rt);
-	printf("Current local time and date: %s", asctime(timeinfo));
-
-	cout << timeinfo->tm_sec << endl;
-}
-
-void Analog_clock_window::draw_shape()
+void animation_window::draw_shape(Airplane& plane)
 {
 	if (s.size() != 0)
 	{
@@ -85,63 +119,14 @@ void Analog_clock_window::draw_shape()
 		}
 	}
 
-	Point center(xmax / 2, ymax / 2);
-
-	for (int i = 0; i < 12; i++)
-	{
-		Point pt1(0, -100);
-		Point pt2(0, -95);
-		double rad = ((2 * M_PI) / 12) * i;
-
-		Point rotated_pt1 = Point(cos(rad) * pt1.x - sin(rad) * pt1.y, sin(rad) * pt1.x + cos(rad) * pt1.y);
-		Point rotated_pt2 = Point(cos(rad) * pt2.x - sin(rad) * pt2.y, sin(rad) * pt2.x + cos(rad) * pt2.y);
-
-		s.push_back(new Hands(Point(rotated_pt1.x + center.x, rotated_pt1.y + center.y), Point(rotated_pt2.x + center.x, rotated_pt2.y + center.y), Color::black));
-		attach(s[s.size() - 1]);
-	}
-
-#pragma warning(disable : 4996) //_CRT_SECURE_NO_WARNINGS
-	time_t rawT;
-	time(&rawT);
-
-	struct tm * timeinfo;
-	timeinfo = localtime(&rawT);
-	asctime(timeinfo);
-
-	printf("Current local time and date: %s", asctime(timeinfo));
-
-	// SECOND HAND
-	Point origin_Pt1(0, -100);
-
-	double rad = timeinfo->tm_sec * ((2 * M_PI) / 60);
-	Point rotated_Pt1 = Point(cos(rad) * origin_Pt1.x - sin(rad) * origin_Pt1.y, sin(rad) * origin_Pt1.x + cos(rad) * origin_Pt1.y);
-
-	s.push_back(new Hands(center, Point(rotated_Pt1.x + center.x, rotated_Pt1.y + center.y), Color::red));
-	attach(s[s.size() - 1]);
-
-	// MINUTE HAND
-	Point origin_Pt2(0, -80);
-
-	rad = timeinfo->tm_min * ((2 * M_PI) / 60);
-	Point rotated_Pt2 = Point(cos(rad) * origin_Pt2.x - sin(rad) * origin_Pt2.y, sin(rad) * origin_Pt2.x + cos(rad) * origin_Pt2.y);
-
-	s.push_back(new Hands(center, Point(rotated_Pt2.x + center.x, rotated_Pt2.y + center.y), Color::blue));
-	attach(s[s.size() - 1]);
-
-	// HOUR HAND
-	Point origin_Pt3(0, -60);
-
-	rad = timeinfo->tm_hour * ((2 * M_PI) / 12) + (timeinfo->tm_min * ((2 * M_PI) / 60)) / 12;
-	Point rotated_Pt3 = Point(cos(rad) * origin_Pt3.x - sin(rad) * origin_Pt3.y, sin(rad) * origin_Pt3.x + cos(rad) * origin_Pt3.y);
-
-	s.push_back(new Hands(center, Point(rotated_Pt3.x + center.x, rotated_Pt3.y + center.y), Color::black));
+	s.push_back(plane);
 	attach(s[s.size() - 1]);
 }
 
 int main()
 try
 {
-	Analog_clock_window win(Point(100, 100), xmax, ymax + 20, "analog clock");
+	animation_window win(Point(100, 100), xmax, ymax + 20, "flying airplane");
 
 	return gui_main();
 }
