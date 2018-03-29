@@ -80,33 +80,48 @@ void Airplane::draw_lines() const
 struct animation_window : Window {
 	animation_window(Point xy, int w, int h, const string& title)
 		: Window(xy, w, h, title),
-		quit_button(Point(x_max() - 70, 0), 70, 20, "Quit", cb_quit)
+		quit_button(Point(x_max() - 70, 0), 70, 20, "Quit", cb_quit),
+		start_stop_button(Point(x_max() - 70, 20), 70, 20, "Start/Stop", cb_start_stop)
 	{
 		attach(quit_button);
+		attach(start_stop_button);
 		//position = Point(0, 0);
 		Airplane plane("Data/airplanes-work-1.jpg", Point(0, 0), w, h);
+		run = false;
 
 		while (true) {
 			Fl::wait();
-			Sleep(10);	
+			Sleep(10);
 			draw_shape(plane);
-			plane.move();
-			Fl::redraw();
+			if (run)
+			{
+				plane.move();
+				Fl::redraw();
+			}
+			
 		}
 	}
 
 	Vector_ref<Shape> s;
-	void move_next(Point& pos);
 	void draw_shape(Airplane& plane);
 
 	Button quit_button;
+	Button start_stop_button;
+
+	bool run;
 
 private:
 
-	//Point position;
-
 	static void cb_quit(Address, Address addr) { reference_to<animation_window>(addr).quit(); }
+	static void cb_start_stop(Address, Address addr) { reference_to<animation_window>(addr).start_stop(); }
+
 	void quit() { hide(); }
+	void start_stop()
+	{
+		if (run) { run = false; }
+		else { run = true; }
+	}
+
 };
 
 void animation_window::draw_shape(Airplane& plane)
