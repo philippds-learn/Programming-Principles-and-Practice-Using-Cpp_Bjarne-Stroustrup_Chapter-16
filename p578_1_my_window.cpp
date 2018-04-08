@@ -31,7 +31,7 @@ struct My_window : Window {
 	{
 		while (!next_button_pushed) Fl::wait();
 		next_button_pushed = false;
-		Fl::redraw();	
+		Fl::redraw();
 	}
 
 	Button next_button;

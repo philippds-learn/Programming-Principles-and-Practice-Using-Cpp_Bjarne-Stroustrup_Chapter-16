@@ -48,6 +48,7 @@ private:
 	// menu button
 	Button from_menu_button;
 	Button to_menu_button;
+
 	// menu
 	Menu from_menu;
 	Menu to_menu;

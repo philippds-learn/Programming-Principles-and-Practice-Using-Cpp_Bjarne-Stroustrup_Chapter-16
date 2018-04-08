@@ -48,6 +48,7 @@ Lines_window::Lines_window(Point xy, int w, int h, const string& title)
 	attach(next_y);
 	attach(xy_out);
 	xy_out.put("no point");
+	lines.set_color(Color::black);
 	attach(lines);
 }
 
